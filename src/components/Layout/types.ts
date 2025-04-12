@@ -1,17 +1,23 @@
 import { ReactNode } from "react";
 
 export interface LayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export interface NavLinkObj {
-  to: string,
-  linkName: string
+  to: string;
+  linkName: string;
 }
 
-export interface JokeTextInterface {
-  joke: string | undefined,
-  error: string | undefined,
-  isLoading: boolean,
-  getJoke: () => void
+export interface UserTextInterface {
+  user: string | undefined;
+  name: string | undefined;
+  email: string | undefined;
+  error: string | undefined;
+  city?: string | undefined;
+  country?: string | undefined;
+  phone?: string | undefined;
+  avatar?: string | undefined;
+  isLoading: boolean;
+  getUser: () => void;
 }

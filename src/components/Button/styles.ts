@@ -5,17 +5,22 @@ interface MainButtonStyledProps {
 }
 
 export const MainButton = styled.button<MainButtonStyledProps>`
-  width: 100%;
-  height: fit-content;
-  padding: 20px;
-  background: ${({ danger }) => danger ? 'rgb(176, 44, 11)' : 'rgb(17, 48, 127)'};
+  padding: 12px;
+  background-color: #d4165a; 
   border: none;
-  border-radius: 6px;
-  font-size: 26px;
+  border-radius: 8px; 
   color: white;
+  font-size: 18px;
+  font-weight: bold;
   cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 
-  &:disabled {
-    background-color: rgb(202, 200, 200);
+  &:hover {
+    background-color: #e80065; 
+    transform: scale(1.05); 
   }
-`
+  &:disabled {
+    background-color: #cccccc; 
+    cursor: not-allowed;
+  }
+`;

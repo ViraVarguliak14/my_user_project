@@ -1,109 +1,88 @@
-import { v4 } from "uuid"
-import { Link, useNavigate } from "react-router-dom"
-import axios from "axios"
-import { createContext, useState } from "react"
-import { JokeTextInterface, LayoutProps, NavLinkObj } from "./types"
+import { Link } from "react-router-dom";
+import { Footer, Header, LayoutComponent, Main, MainLink, Nav, StyledNavLink, WelcomeText } from "./styles";
+import { useState } from "react";
+import axios from "axios";
+import { navLinksData } from "./data";
+import { NavLinkObj, UserTextInterface, LayoutProps } from "./types";
+import { v4 } from "uuid";
 
-import {
-  LayoutComponent, 
-  Header, 
-  LogoText, 
-  Nav, 
-  Main, 
-  Footer,
-  StyledNavLink,
-  LogoImage,
-  ButtonContainer
-} from "./styles"
-import { navLinksData } from "./data"
-import Logo from '../../assets/avatar.jpg'
-import Button from "../Button/Button"
+import React from "react";
 
 
-
-export const JokeContext = createContext<JokeTextInterface>({
-  joke: undefined,
+// eslint-disable-next-line react-refresh/only-export-components
+export const UserDataContext = React.createContext<UserTextInterface>({
+  user: undefined,
+  name: undefined,
+  email: undefined,
   error: undefined,
   isLoading: false,
-  getJoke: ()=>{}
-})
+  getUser: () => { },
+});
 
-function Layout({children} : LayoutProps) {
-  const [joke, setJoke] = useState<string | undefined>(undefined);
+function Layout({ children }: LayoutProps) {
+  const [user, setUser] = useState<string | undefined>(undefined);
+  const [name, setName] = useState<string | undefined>(undefined);
+  const [email, setEmail] = useState<string | undefined>(undefined);
+  const [city, setCity] = useState<string | undefined>(undefined);
+  const [country, setCountry] = useState<string | undefined>(undefined);
+  const [phone, setPhone] = useState<string | undefined>(undefined);
+  const [avatar, setAvatar] = useState<string | undefined>(undefined);
   const [error, setError] = useState<string | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setLoading] = useState<boolean>(false);
 
-  const JOKE_URL: string = 'https://official-joke-api.appspot.com/random_joke';
+  const USER_URL: string = 'https://randomuser.me/api/';
 
-  const getJoke = async () => {
-    setError(undefined)
+  const getUser = async () => {
+    setError(undefined);
     try {
-      setIsLoading(true);
-      const response = await axios.get(JOKE_URL)
-      console.log(response.data);
-      const data = response.data;
-      setJoke(`${data.setup} - ${data.punchline}`)
+      setLoading(true);
+      const response = await axios.get(USER_URL);
+      const data = response.data.results[0];
+      setUser(`${data.name.first} ${data.name.last}`);
+      setName(data.name.first);
+      setEmail(data.email);
+      setCity(data.location.city);
+      setCountry(data.location.country);
+      setPhone(data.phone);
+      setAvatar(data.picture.large);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('Unexpected error occurred');
+      }
+    } finally {
+      setLoading(false);
     }
-    catch (error: any) {
-      console.log(error.message);
-      setError(error.message)
-    }
-    finally {
-      console.log('Результат получен');
-      setIsLoading(false);
-    }
-  }
+  };
 
-// const goBack = ()=>{
-//     //при вызове функции navigate, если добавить в качестве атрибута -1,
-//   //тогда при выполнении функции нас всегда будет возвращать на предыдущую открытую страницу
-//   navigate(-1)
-// }
+  const navLinks = navLinksData.map((navLink: NavLinkObj) => (
+    <StyledNavLink
+      key={v4()}
+      to={navLink.to}
+      style={({ isActive }) => ({ textDecoration: isActive ? 'underline' : 'none' })}
+    >
+      {navLink.linkName}
+    </StyledNavLink>
+  ));
 
-  const navLinks = navLinksData.map((navLink: NavLinkObj) => {
-    return (
-      <StyledNavLink key={v4()} to={navLink.to} style={
-        ({ isActive }) => ({ textDecoration: isActive ? 'underline' : 'none' })
-      }>{navLink.linkName}</StyledNavLink>
-    )
-  })
-  
   return (
-    <JokeContext.Provider value={{ joke, error, isLoading, getJoke }}>
-    <LayoutComponent>
-      <Header>
-        <Link to='/'>
-          <LogoImage src={Logo}/>
-          </Link>
-        <Nav>
-          {/* NavLink - это компонент библиотеки, который добавляет ссылку на страницу 
-          по маршруту через prop to */}
-             {/* <StyledNavLink to='/' style={
-            ({ isActive }) => ({ textDecoration: isActive ? 'underline' : 'none' })
-          }>Home</StyledNavLink>
-          <StyledNavLink to='/about' style={
-            ({ isActive }) => ({ textDecoration: isActive ? 'underline' : 'none' })
-          }>About</StyledNavLink>
-          <StyledNavLink to='/course' style={
-            ({ isActive }) => ({ textDecoration: isActive ? 'underline' : 'none' })
-          }>Course</StyledNavLink>
-          <StyledNavLink to='/courseLesson' style={
-            ({ isActive }) => ({ textDecoration: isActive ? 'underline' : 'none' })
-          }>CourseLesson</StyledNavLink> */}
-          {/* Через константу  navLinks создаем массив с объектами и в </Nav> вставляем лишь navLinks*/}
-
-          {navLinks}
-        </Nav>
-      </Header>
-      <Main>{children}</Main>
-      <Footer>
-        <ButtonContainer>
-        <Button name="<-" onClick={useNavigate}/>
-        </ButtonContainer>
-        <LogoText>Company name</LogoText>
-      </Footer>
-    </LayoutComponent>
-    </JokeContext.Provider>
-  )
+    <UserDataContext.Provider value={{
+      user, name, email, error, isLoading, getUser,
+      city, country, phone, avatar
+    }}>
+      <LayoutComponent>
+        <Header>
+          <Link to="/"></Link>
+          <Nav>{navLinks}</Nav>
+        </Header>
+        <Main><WelcomeText>Welcome to Our Website!</WelcomeText>{children}</Main>
+        <Footer>
+        <MainLink to="/layout">Go to Page</MainLink>
+        </Footer>
+      </LayoutComponent>
+    </UserDataContext.Provider>
+  );
 }
+
 export default Layout;
